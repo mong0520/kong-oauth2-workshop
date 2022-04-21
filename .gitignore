@@ -1,3 +1,4 @@
 cert/
 kong_data/
 upstream/venv
+upstream/__pycache__/

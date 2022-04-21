@@ -5,8 +5,9 @@
 ```sh
 make gen-cert
 make gen-cert-key
-make bulid
+make build
 make run_db
+# wait for 30 seconds
 make migrate
 make run
 ```
@@ -14,20 +15,19 @@ make run
 ## Test
 
 ```sh
-http://localhost:8001/services
+curl http://localhost:8001/services
 ```
 
 ## Let the upstream be protected by OAuth2 plugin
 
 - Add a service
-> replace ip address by what your flask app listens on.
 ```sh
 curl --request POST \
   --url http://localhost:8001/services \
   --header 'Content-Type: application/json' \
   --data '{
 	"name": "stepcounts",
-	"url": "http://10.58.0.77:5050/stepcounts"
+	"url": "http://host.docker.internal:5050/stepcounts"
 }'
 ```
 
@@ -46,8 +46,9 @@ curl --request POST \
 ```
 
 - Test route via Kong
+> you will get `HTTP/1.1 401 UNAUTHORIZED`
 ```sh
-curl --request GET \
+curl -k --request GET \
   --url https://localhost:8000/stepon \
   --header 'Content-Type: application/json'
 ```
@@ -101,35 +102,35 @@ curl --request POST \
 
 - Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`
 ```sh
-curl --request POST \
+curl -k --request POST \
   --url https://localhost:8000/stepon/oauth2/authorize \
   --header 'Content-Type: application/json' \
   --data '{
-	"client_id": "lmsif4IbZeyQh2DmlxLE6l9rmaYKQTAE",
+	"client_id": "neEhJHdNlM08llc1W63OqP9jRGbabWvT",
 	"response_type": "code",
 	"scope": "step_counts",
-	"provision_key": "unKTv1nJ50T9gn6oo6OWhB7YM4ooUfj3",
+	"provision_key": "V8OKoryTkT9RgrRRSaMe8RYnOvq5KIdZ",
 	"authenticated_userid": "neil"
 }'
 ```
 
 - Exhange Authorization code for Access Token, replace `code`, `client_id` and `client_secret` by what you got in prevoius steps, save the retured value `access_token`
 ```sh
-curl --request POST \
+curl -k --request POST \
   --url https://localhost:8000/stepon/oauth2/token \
   --header 'Content-Type: application/json' \
   --data '{
 	"grant_type": "authorization_code",
-	"code": "0WWTnj5gUfpwzMeBMSlh9Rj8t4Izk6Hz",
-	"client_id": "lmsif4IbZeyQh2DmlxLE6l9rmaYKQTAE",
-	"client_secret": "mqfJWzreNvnjIFJLamPJIx0Mv1pVVZX8"
+	"code": "NYhW6GIJGFwaBecPMYvTk1yJId8o30T3",
+	"client_id": "neEhJHdNlM08llc1W63OqP9jRGbabWvT",
+	"client_secret": "rW8pEccMF6Ni9zlv4bgei6mxrA4s3hSH"
 }'
 ```
 
 - Ruqest upstream again with `access_token`
 ```sh
-curl --request GET \
+curl -k --request GET \
   --url https://localhost:8000/stepon \
-  --header 'Authorization: bearer ciSL5IufVjurhJFiwosR6xuQWtJ1BQhl' \
+  --header 'Authorization: bearer 7pImqBHdT5eiIZIATrAVwHub9kSj5WL5' \
   --header 'Content-Type: application/json'
 ```

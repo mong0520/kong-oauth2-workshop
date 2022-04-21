@@ -4,7 +4,7 @@
 ```sh
 python3.9 -m venv venv
 source ./venv/bin/activate
-source ./venv/bin/activate
+pip3.9 install -r requirements.txt
 flask run --port 5050 --host 0.0.0.0
 ```
 
