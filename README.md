@@ -1,6 +1,8 @@
 # kong-oauth2-workshop
 
-## Setup
+## Setup upstream
+Read `upstream/README.md` to setup the upstream
+## Setup Kong
 
 ```sh
 make gen-cert
@@ -20,7 +22,7 @@ curl http://localhost:8001/services
 
 ## Let the upstream be protected by OAuth2 plugin
 
-- Add a service
+### Add a service
 ```sh
 curl --request POST \
   --url http://localhost:8001/services \
@@ -31,7 +33,7 @@ curl --request POST \
 }'
 ```
 
-- Add a route
+### Add a route
 ```sh
 curl --request POST \
   --url http://localhost:8001/routes \
@@ -45,7 +47,7 @@ curl --request POST \
 }'
 ```
 
-- Test route via Kong
+### Test route via Kong
 > you will get `HTTP/1.1 401 UNAUTHORIZED`
 ```sh
 curl -k --request GET \
@@ -53,7 +55,7 @@ curl -k --request GET \
   --header 'Content-Type: application/json'
 ```
 
-- Enable OAuth2 plugin for the route, and save the returned value `provision_key`
+### Enable OAuth2 plugin for the route, and save the returned value `provision_key`
 ```sh
 curl --request POST \
   --url http://localhost:8001/services/stepcounts/plugins \
@@ -77,7 +79,7 @@ curl --request POST \
 }'
 ```
 
-- Add a consumer
+### Add a consumer
 ```sh
 curl --request POST \
   --url http://localhost:8001/consumers \
@@ -87,7 +89,7 @@ curl --request POST \
 }'
 ```
 
-- Add OAuth2 credentials for the consumer, save the returned value `client_id` and `client_secret`
+### Add OAuth2 credentials for the consumer, save the returned value `client_id` and `client_secret`
 ```sh
 curl --request POST \
   --url http://localhost:8001/consumers/shoeflyshoe/oauth2 \
@@ -100,7 +102,7 @@ curl --request POST \
 }'
 ```
 
-- Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`
+### Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`
 ```sh
 curl -k --request POST \
   --url https://localhost:8000/stepon/oauth2/authorize \
@@ -114,7 +116,7 @@ curl -k --request POST \
 }'
 ```
 
-- Exhange Authorization code for Access Token, replace `code`, `client_id` and `client_secret` by what you got in prevoius steps, save the retured value `access_token`
+### Exhange Authorization code for Access Token, replace `code`, `client_id` and `client_secret` by what you got in prevoius steps, save the retured value `access_token`
 ```sh
 curl -k --request POST \
   --url https://localhost:8000/stepon/oauth2/token \
@@ -127,7 +129,7 @@ curl -k --request POST \
 }'
 ```
 
-- Ruqest upstream again with `access_token`
+### Ruqest upstream again with `access_token`
 ```sh
 curl -k --request GET \
   --url https://localhost:8000/stepon \
