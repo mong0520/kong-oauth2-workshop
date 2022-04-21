@@ -139,6 +139,6 @@ curl -k --request GET \
 
 
 ## Reference
-https://konghq.com/blog/kong-gateway-oauth2
-https://www.youtube.com/watch?v=AIYIHZbDziI&ab_channel=Kong
-https://docs.konghq.com/hub/kong-inc/oauth2/1.0.x.html
+- https://konghq.com/blog/kong-gateway-oauth2
+- https://www.youtube.com/watch?v=AIYIHZbDziI&ab_channel=Kong
+- https://docs.konghq.com/hub/kong-inc/oauth2/1.0.x.html
