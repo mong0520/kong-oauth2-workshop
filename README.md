@@ -136,3 +136,9 @@ curl -k --request GET \
   --header 'Authorization: bearer 7pImqBHdT5eiIZIATrAVwHub9kSj5WL5' \
   --header 'Content-Type: application/json'
 ```
+
+
+## Reference
+https://konghq.com/blog/kong-gateway-oauth2
+https://www.youtube.com/watch?v=AIYIHZbDziI&ab_channel=Kong
+https://docs.konghq.com/hub/kong-inc/oauth2/1.0.x.html
