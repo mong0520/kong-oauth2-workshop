@@ -7,9 +7,9 @@ make run_upstream
 ```
 
 ### Test upstream
-
+> you will get a reponse with empty data
 ```sh
-curl http://localhost:5000/me
+curl http://localhost:5000/bio
 ```
 
 
@@ -25,7 +25,6 @@ make run_kong
 ```
 
 ## Test Kong
-
 ```sh
 curl http://localhost:8001/services
 ```
@@ -36,14 +35,15 @@ curl --request POST \
   --url http://localhost:8001/services \
   --header 'Content-Type: application/json' \
   --data '{
-	"name": "user_service",
-	"url": "http://host.docker.internal:5000/me"
+	"name": "bio_service",
+	"url": "http://host.docker.internal:5000/bio"
 }'
 ```
 
-## Test upstream via Kong
+## Test route via Kong
+> you will get a reponse with empty data
 ```sh
-curl http://localhost:8000/me
+curl http://localhost:8000/bio
 ```
 
 ## Let the upstream be protected by OAuth2 plugin
@@ -54,8 +54,8 @@ curl --request POST \
   --url http://localhost:8001/services \
   --header 'Content-Type: application/json' \
   --data '{
-	"name": "user_service",
-	"url": "http://host.docker.internal:5050/stepcounts"
+	"name": "bio_service",
+	"url": "http://host.docker.internal:5000/bio"
 }'
 ```
 
@@ -67,9 +67,9 @@ curl --request POST \
   --data '{
 	"name": "user_route",
 	"service": {
-		"name": "user_service"
+		"name": "bio_service"
 	},
-	"paths": ["/user_service"]
+	"paths": ["/bio"]
 }'
 ```
 
@@ -77,7 +77,7 @@ curl --request POST \
 > you can visit it but th resonse data is empty
 ```sh
 curl -k --request GET \
-  --url https://localhost:8000/user_service \
+  --url https://localhost:8000/bio \
   --header 'Content-Type: application/json'
 ```
 
@@ -93,8 +93,7 @@ curl --request POST \
 		"scopes": [
 			"user_profile",
 			"email",
-			"biometric",
-			"step_counts"
+			"biometric"
 		],
 		"mandatory_scope": true,
 		"enable_authorization_code": true
@@ -137,7 +136,7 @@ curl -k --request POST \
   --data '{
 	"client_id": "REPLACE_ME",
 	"response_type": "code",
-	"scope": "step_counts",
+	"scope": "biometric",
 	"provision_key": "REPLACE_ME",
 	"authenticated_userid": "neil"
 }'
