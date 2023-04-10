@@ -18,4 +18,4 @@ migrate_kong:
 	docker-compose run kong kong migrations bootstrap
 
 run_kong:
-	docker-compose run --rm --service-ports kong kong start
+	docker-compose run --rm -d --service-ports kong kong start

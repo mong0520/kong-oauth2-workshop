@@ -19,36 +19,17 @@ curl http://localhost:5000/bio
 make gen-cert
 make build_kong
 make run_db
-# wait for few seconds
+# wait for about 10 seconds
 make migrate_kong
 make run_kong
 ```
 
-## Test Kong
+## Test Kong is ready
 ```sh
 curl http://localhost:8001/services
 ```
 
 ## Add a service that can be public vist via Kong
-```sh
-curl --request POST \
-  --url http://localhost:8001/services \
-  --header 'Content-Type: application/json' \
-  --data '{
-	"name": "bio_service",
-	"url": "http://host.docker.internal:5000/bio"
-}'
-```
-
-## Test route via Kong
-> you will get a reponse with empty data
-```sh
-curl http://localhost:8000/bio
-```
-
-## Let the upstream be protected by OAuth2 plugin
-
-### Add a service
 ```sh
 curl --request POST \
   --url http://localhost:8001/services \
@@ -85,7 +66,7 @@ curl -k --request GET \
 ### Enable OAuth2 plugin for the route, and save the returned value `provision_key`
 ```sh
 curl --request POST \
-  --url http://localhost:8001/services/user_service/plugins \
+  --url http://localhost:8001/services/bio_service/plugins \
   --header 'Content-Type: application/json' \
   --data '{
 	"name": "oauth2",
@@ -103,6 +84,14 @@ curl --request POST \
 		"https"
 	]
 }'
+```
+
+### Test route via Kong
+> you will get 401 Unauthorized
+```sh
+curl -k --request GET \
+  --url https://localhost:8000/bio \
+  --header 'Content-Type: application/json'
 ```
 
 ### Add a consumer
