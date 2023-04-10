@@ -1,18 +1,12 @@
 # kong-oauth2-workshop
 
 ## 1) Setup upstream
-### Setup uptream
-```sh
-make run_upstream
-```
-
-### Test upstream
+### Setup and test uptream
 > you will get a reponse with empty data
 ```sh
+make run_upstream
 curl http://localhost:5000/bio
 ```
-
-
 ## 2) Setup Kong and upstream
 
 ### Setup Kong
