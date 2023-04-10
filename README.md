@@ -1,14 +1,14 @@
 # kong-oauth2-workshop
 
 ## 1) Setup upstream
-> you will get a reponse with empty data
+You will get a reponse with empty data.
 ```sh
 make run_upstream
 curl http://localhost:5000/bio
 ```
 ## 2) Setup Kong and upstream
 
-### Setup Kong
+### 2.1) Setup Kong
 ```sh
 make gen-cert
 make build_kong
@@ -18,12 +18,12 @@ make migrate_kong
 make run_kong
 ```
 
-### Test Kong is ready
+### 2.2) Test Kong is ready
 ```sh
 curl http://localhost:8001/services
 ```
 
-### Add a service that can be public vist via Kong
+### 2.3) Add a service that can be public vist via Kong
 ```sh
 curl --request POST \
   --url http://localhost:8001/services \
@@ -34,7 +34,7 @@ curl --request POST \
 }'
 ```
 
-### Add a route
+### 2.4) Add a route
 ```sh
 curl --request POST \
   --url http://localhost:8001/routes \
@@ -48,8 +48,8 @@ curl --request POST \
 }'
 ```
 
-### Test route via Kong
-> you can visit it but th resonse data is empty
+### 2.5) Test route via Kong
+> You can now visit the upstream via Kong!
 ```sh
 curl -k --request GET \
   --url https://localhost:8000/bio \
@@ -57,8 +57,10 @@ curl -k --request GET \
 ```
 
 
-## 3)Add OAuth2 plugin to protect the route
-### Enable OAuth2 plugin for the route, and save the returned value of `provision_key`
+## 3) Enable OAuth2
+### 3.1) Enable OAuth2 plugin for the route.
+> Save the returned value of `provision_key`
+>
 ```sh
 curl --request POST \
   --url http://localhost:8001/services/bio_service/plugins \
@@ -81,7 +83,7 @@ curl --request POST \
 }'
 ```
 
-### Test route via Kong
+### 3.2) Test route via Kong
 > you will get 401 Unauthorized
 ```sh
 curl -k --request GET \
@@ -89,7 +91,7 @@ curl -k --request GET \
   --header 'Content-Type: application/json'
 ```
 
-### Add a consumer
+### 3.3) Add a consumer
 ```sh
 curl --request POST \
   --url http://localhost:8001/consumers \
@@ -99,7 +101,8 @@ curl --request POST \
 }'
 ```
 
-### Add OAuth2 client for the consumer, save the returned value `client_id` and `client_secret`
+### 3.4) Add OAuth2 client for the consumer
+> save the returned value of `client_id` and `client_secret`
 ```sh
 curl --request POST \
   --url http://localhost:8001/consumers/user_a/oauth2 \
@@ -112,10 +115,13 @@ curl --request POST \
 }'
 ```
 
-### Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`, you can replace `authenticated_userid` for any user you like.
+### 3.5) Request Authorization Code,
+> replace `client_id` and `provision_key` by what you got in previous steps.
+> Save the returned value `code`.
+
 ```sh
 curl -k --request POST \
-  --url https://localhost:8000/user_service/oauth2/authorize \
+  --url https://localhost:8000/bio_service/oauth2/authorize \
   --header 'Content-Type: application/json' \
   --data '{
 	"client_id": "REPLACE_ME",
@@ -126,10 +132,13 @@ curl -k --request POST \
 }'
 ```
 
-### Exhange Authorization code for Access Token, replace `code`, `client_id` and `client_secret` by what you got in prevoius steps, save the retured value `access_token`
+### 3.6) Exhange Authorization code for Access Token,
+> replace `code`, `client_id` and `client_secret` by what you got in prevoius steps,
+> save the retured value `access_token`
+
 ```sh
 curl -k --request POST \
-  --url https://localhost:8000/user_service/oauth2/token \
+  --url https://localhost:8000/bio_service/oauth2/token \
   --header 'Content-Type: application/json' \
   --data '{
 	"grant_type": "authorization_code",
@@ -139,19 +148,19 @@ curl -k --request POST \
 }'
 ```
 
-### Ruqest upstream without `access_token`
+### 3.7) Ruqest upstream without `access_token`
 > you will get 401 and The access token is missing
 ```sh
 curl -k --request GET \
-  --url https://localhost:8000/user_service \
+  --url https://localhost:8000/bio_service \
   --header 'Content-Type: application/json'
 ```
 
-### Ruqest upstream with `access_token`
+### 3.8) Ruqest upstream with `access_token`
 > Congrats! the route is protected by Access Token!
 ```sh
-curl --request GET \
-  --url https://localhost:8000/user_service \
+curl -k --request GET \
+  --url https://localhost:8000/bio \
   --header 'Authorization: bearer REPLACE_ME' \
   --header 'Content-Type: application/json'
 ```
