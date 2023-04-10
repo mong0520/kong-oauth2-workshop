@@ -1,20 +1,21 @@
 gen-cert:
 	mkdir -p cert && \
 	cd cert && \
-	openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365
-
-gen-cert-key:
-	cd cert && \
+	openssl req -x509 -newkey rsa:2048 -keyout keytmp.pem -out cert.pem -days 365 -nodes -subj "/emailAddress=dev@www.example.com" && \
 	openssl rsa -in keytmp.pem -out key.pem
 
-build:
+build_kong:
 	docker-compose build kong
 
 run_db:
 	docker-compose up -d db
 
-migrate:
+run_upstream:
+	docker-compose build upstream
+	docker-compose up -d upstream
+
+migrate_kong:
 	docker-compose run kong kong migrations bootstrap
 
-run:
+run_kong:
 	docker-compose run --rm --service-ports kong kong start

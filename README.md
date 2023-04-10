@@ -1,23 +1,49 @@
 # kong-oauth2-workshop
 
 ## Setup upstream
-Read `upstream/README.md` to setup the upstream
+
+```sh
+make run_upstream
+```
+
+### Test upstream
+
+```sh
+curl http://localhost:5000/me
+```
+
+
 ## Setup Kong
 
 ```sh
 make gen-cert
-make gen-cert-key
-make build
+make build_kong
 make run_db
-# wait for 30 seconds
-make migrate
-make run
+# wait for few seconds
+make migrate_kong
+make run_kong
 ```
 
-## Test
+## Test Kong
 
 ```sh
 curl http://localhost:8001/services
+```
+
+## Add a service that can be public vist via Kong
+```sh
+curl --request POST \
+  --url http://localhost:8001/services \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"name": "user_service",
+	"url": "http://host.docker.internal:5000/me"
+}'
+```
+
+## Test upstream via Kong
+```sh
+curl http://localhost:8000/me
 ```
 
 ## Let the upstream be protected by OAuth2 plugin
@@ -28,7 +54,7 @@ curl --request POST \
   --url http://localhost:8001/services \
   --header 'Content-Type: application/json' \
   --data '{
-	"name": "stepcounts",
+	"name": "user_service",
 	"url": "http://host.docker.internal:5050/stepcounts"
 }'
 ```
@@ -39,26 +65,27 @@ curl --request POST \
   --url http://localhost:8001/routes \
   --header 'Content-Type: application/json' \
   --data '{
-	"name": "stepon",
+	"name": "user_route",
 	"service": {
-		"name": "stepcounts"
+		"name": "user_service"
 	},
-	"paths": ["/stepon"]
+	"paths": ["/user_service"]
 }'
 ```
 
 ### Test route via Kong
-> you will get `HTTP/1.1 401 UNAUTHORIZED`
+> you can visit it but th resonse data is empty
 ```sh
 curl -k --request GET \
-  --url https://localhost:8000/stepon \
+  --url https://localhost:8000/user_service \
   --header 'Content-Type: application/json'
 ```
+
 
 ### Enable OAuth2 plugin for the route, and save the returned value `provision_key`
 ```sh
 curl --request POST \
-  --url http://localhost:8001/services/stepcounts/plugins \
+  --url http://localhost:8001/services/user_service/plugins \
   --header 'Content-Type: application/json' \
   --data '{
 	"name": "oauth2",
@@ -85,33 +112,33 @@ curl --request POST \
   --url http://localhost:8001/consumers \
   --header 'Content-Type: application/json' \
   --data '{
-	"username": "shoeflyshoe"
+	"username": "user_a"
 }'
 ```
 
-### Add OAuth2 credentials for the consumer, save the returned value `client_id` and `client_secret`
+### Add OAuth2 client for the consumer, save the returned value `client_id` and `client_secret`
 ```sh
 curl --request POST \
-  --url http://localhost:8001/consumers/shoeflyshoe/oauth2 \
+  --url http://localhost:8001/consumers/user_a/oauth2 \
   --header 'Content-Type: application/json' \
   --data '{
-	"name": "Shoe Fly Shoe Customer Rewards",
+	"name": "Kong workshop user",
 	"redirect_uris": [
 		"https://fakeurl"
 	]
 }'
 ```
 
-### Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`
+### Request Authorization Code, replace `client_id` and `provision_key` by what you got in previous steps. Save the returned value `code`, you can replace `authenticated_userid` for any user you like.
 ```sh
 curl -k --request POST \
-  --url https://localhost:8000/stepon/oauth2/authorize \
+  --url https://localhost:8000/user_service/oauth2/authorize \
   --header 'Content-Type: application/json' \
   --data '{
-	"client_id": "neEhJHdNlM08llc1W63OqP9jRGbabWvT",
+	"client_id": "REPLACE_ME",
 	"response_type": "code",
 	"scope": "step_counts",
-	"provision_key": "V8OKoryTkT9RgrRRSaMe8RYnOvq5KIdZ",
+	"provision_key": "REPLACE_ME",
 	"authenticated_userid": "neil"
 }'
 ```
@@ -119,21 +146,30 @@ curl -k --request POST \
 ### Exhange Authorization code for Access Token, replace `code`, `client_id` and `client_secret` by what you got in prevoius steps, save the retured value `access_token`
 ```sh
 curl -k --request POST \
-  --url https://localhost:8000/stepon/oauth2/token \
+  --url https://localhost:8000/user_service/oauth2/token \
   --header 'Content-Type: application/json' \
   --data '{
 	"grant_type": "authorization_code",
-	"code": "NYhW6GIJGFwaBecPMYvTk1yJId8o30T3",
-	"client_id": "neEhJHdNlM08llc1W63OqP9jRGbabWvT",
-	"client_secret": "rW8pEccMF6Ni9zlv4bgei6mxrA4s3hSH"
+	"code": "REPLACE_ME",
+	"client_id": "REPLACE_ME",
+	"client_secret": "REPLACE_ME"
 }'
 ```
 
-### Ruqest upstream again with `access_token`
+### Ruqest upstream without `access_token`
+> you will get 401 and The access token is missing
 ```sh
 curl -k --request GET \
-  --url https://localhost:8000/stepon \
-  --header 'Authorization: bearer 7pImqBHdT5eiIZIATrAVwHub9kSj5WL5' \
+  --url https://localhost:8000/user_service \
+  --header 'Content-Type: application/json'
+```
+
+### Ruqest upstream with `access_token`
+> Congrats! the route is protected by Access Token!
+```sh
+curl --request GET \
+  --url https://localhost:8000/user_service \
+  --header 'Authorization: bearer REPLACE_ME' \
   --header 'Content-Type: application/json'
 ```
 
