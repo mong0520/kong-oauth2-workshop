@@ -15,7 +15,7 @@ run_upstream:
 	docker-compose up -d upstream
 
 migrate_kong:
-	docker-compose run kong kong migrations bootstrap
+	docker-compose run --rm kong kong migrations bootstrap
 
 run_kong:
 	docker-compose run --rm -d --service-ports kong kong start
