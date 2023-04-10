@@ -1,7 +1,6 @@
 # kong-oauth2-workshop
 
 ## 1) Setup upstream
-### Setup and test uptream
 > you will get a reponse with empty data
 ```sh
 make run_upstream
