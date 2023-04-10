@@ -1,7 +1,7 @@
 # kong-oauth2-workshop
 
-## Setup upstream
-
+## 1) Setup upstream
+### Setup uptream
 ```sh
 make run_upstream
 ```
@@ -13,8 +13,9 @@ curl http://localhost:5000/bio
 ```
 
 
-## Setup Kong
+## 2) Setup Kong and upstream
 
+### Setup Kong
 ```sh
 make gen-cert
 make build_kong
@@ -24,12 +25,12 @@ make migrate_kong
 make run_kong
 ```
 
-## Test Kong is ready
+### Test Kong is ready
 ```sh
 curl http://localhost:8001/services
 ```
 
-## Add a service that can be public vist via Kong
+### Add a service that can be public vist via Kong
 ```sh
 curl --request POST \
   --url http://localhost:8001/services \
@@ -63,7 +64,8 @@ curl -k --request GET \
 ```
 
 
-### Enable OAuth2 plugin for the route, and save the returned value `provision_key`
+## 3)Add OAuth2 plugin to protect the route
+### Enable OAuth2 plugin for the route, and save the returned value of `provision_key`
 ```sh
 curl --request POST \
   --url http://localhost:8001/services/bio_service/plugins \
