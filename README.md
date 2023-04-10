@@ -1,4 +1,5 @@
 # kong-oauth2-workshop
+This workshop demostrates how to use Kong's OAuth2 plugin to protect your private resource.
 
 ## 1) Setup upstream
 You will get a reponse with empty data.
@@ -115,7 +116,7 @@ curl --request POST \
 }'
 ```
 
-### 3.5) Request Authorization Code,
+### 3.5) Request Authorization Code
 > replace `client_id` and `provision_key` by what you got in previous steps.
 > Save the returned value `code`.
 
